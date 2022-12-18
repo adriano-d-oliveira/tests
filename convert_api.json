@@ -1,0 +1,24 @@
+from flask import Flask, request, jsonify
+from io import StringIO
+from pdfminer.converter import TextConverter
+from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.pdfpage import PDFPage
+import json
+
+app = Flask(__name__)
+
+@app.route('/pdf_to_json', methods=['POST'])
+def pdf_to_json():
+    if request.method == 'POST':
+        file = request.files['file']
+        rsrcmgr = PDFResourceManager()
+        retstr = StringIO()
+        laparams = LAParams()
+        device = TextConverter(rsrcmgr, retstr, laparams=laparams)
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        data = {}
+        for page in PDFPage.get_pages(file):
+            interpreter.process_page(page)
+            data['text'] = retstr.getvalue()
+        return jsonify(json
